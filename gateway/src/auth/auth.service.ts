@@ -10,7 +10,7 @@ export class AuthService {
   ) {}
 
   async login(data: any) {
-    console.log("Data received here", data.body);
+    
 
     const response = await firstValueFrom(
       this.authClient.send('login', data.body)
@@ -19,14 +19,22 @@ export class AuthService {
     return response;
   }
 
-    async signUp(data: any) {
-    console.log("Data received here", data.body);
+async signUp(body: any) {
+    
+
+    const signUpPayload = {
+        username: body.username,
+        email: body.email,
+        password:body.password,
+        isGuestUser: body.isGuestUser === "true",
+        roomId: body.roomId ? Number(body.roomId) : null,  // ← pass it through
+    }
 
     const response = await firstValueFrom(
-      this.authClient.send('signup', data.body)
+        this.authClient.send('signup', signUpPayload)
     );
 
     return response;
-  }
+}
 
 }

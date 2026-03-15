@@ -1,6 +1,6 @@
 import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
-import { LoginDto, SignInDto } from './dto/auth.dto';
+import { LoginDto, MembersDto, SignInDto } from './dto/auth.dto';
 import { AuthService } from './auth.service';
 
 @Controller()
@@ -28,6 +28,7 @@ export class AuthController {
         console.log("Login body received:", body);
         try {
             const response = await this.authService.loginService(body);
+            console.log(response);
             return response;
         }
         catch (e: any) {
@@ -37,6 +38,18 @@ export class AuthController {
         return {
             message: "Login failed"
         }
+    }
+
+    @MessagePattern('findMembersForId')
+    async findMembersForid(@Payload() data:{membersIds:number[]}){
+        try{
+            const response = await this.authService.findMembers(data);
+            return response;
+        }
+        catch(e:any){
+            console.error(e);
+        }
+
     }
 
 }

@@ -1,9 +1,9 @@
-import { IsString } from "class-validator";
+import { IsArray,  IsBoolean,  IsString } from "class-validator";
 
 export class LoginDto {
 
     @IsString()
-    userName: string;
+    username: string;
 
     @IsString()
     password: string;
@@ -11,7 +11,7 @@ export class LoginDto {
 
 export class SignInDto {
     @IsString()
-    userName: string;
+    username: string;
 
     @IsString()
     email: string;
@@ -22,4 +22,12 @@ export class SignInDto {
 
     @IsString()
     confirmPassWord: string
+
+    @IsBoolean()
+    isGuestUser:boolean;
+}
+
+export class MembersDto{
+    @IsArray()
+    membersIds:number[]
 }
