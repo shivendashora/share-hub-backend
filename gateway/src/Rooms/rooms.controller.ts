@@ -54,6 +54,7 @@ export class RoomController {
     @UseGuards(JwtAuthGuard)
     async getRoomMembers(@Param('roomId') roomId: string) {
         try {
+            console.log("roomId",roomId);
             const response = await this.roomService.getRoomMembers(roomId);
             return response;
         }
@@ -83,5 +84,24 @@ export class RoomController {
         }
     }
 
+    
+    @Get('getAllRoomsCreatedByUser')
+    @UseGuards(JwtAuthGuard)
+    async getAllRoomsCreatedByUser(@Req() req){
+        try{
+
+            const userId = req.user.userId;
+            const response = await this.roomService.getAllRoomsCreatedByUser(userId)
+            return response;
+        }
+        catch(error){
+            console.error(error);
+        }
+        return{
+            message:"failed fetching rooms for user"
+        }
+    }
+
 
 }
+ 

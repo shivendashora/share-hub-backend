@@ -25,20 +25,6 @@ export class RoomService {
             throw new BadRequestException("userId is required");
         }
 
-        // Check if user already has a room (admin room)
-        const existingRoom = await this.roomsEntity.findOne({
-            where: {
-                userId,
-                isAdmin: true
-            }
-        });
-
-        if (existingRoom) {
-            return {
-                roomId: existingRoom.roomId
-            };
-        }
-
         const roomId = this.generateRoomId();
 
         const room = this.roomsEntity.create({
@@ -122,5 +108,21 @@ export class RoomService {
         }
 
         await this.roomsEntity.remove(member);
+    }
+
+    async getAllRoomsCreatedByUser(userId: number) {
+        try {
+            const getRooms = await this.roomsEntity.find({
+                where: {
+                    userId: userId,
+                    isAdmin: true
+                }
+            });
+            console.log("fetched rooms", getRooms);
+            return getRooms;
+        } catch (error: any) {
+            console.error(error);
+            return [];
+        }
     }
 }
