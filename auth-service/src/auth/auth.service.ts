@@ -29,7 +29,6 @@ export class AuthService {
 
 
     async signUpService(body: SignInDto) {
-    console.log("check for the body", body);
 
     try {
         if (body.isGuestUser) {
@@ -88,8 +87,6 @@ export class AuthService {
 }
     async loginService(body: LoginDto) {
         if (body) {
-            console.log("Login Body", body);
-
             const userFound = await this.userEntity.findOne({
                 where: {
                     userName: body.username
@@ -97,13 +94,8 @@ export class AuthService {
             }
             )
 
-            console.log("userFound", userFound);
-
             const hashedPassword = userFound?.hashedPassword;
-            console.log("hashed password", hashedPassword);
-            console.log("password", body.password);
             if (!await this.validatePassword(body.password, hashedPassword)) {
-                console.log("ni chal raha");
                 return {
                     message: "Incorrect password please try again"
                 }
@@ -143,4 +135,5 @@ async findMembers(data: { membersIds: number[] }) {
         }))
     };
 }
+
 }

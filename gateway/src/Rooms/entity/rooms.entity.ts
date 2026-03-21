@@ -9,10 +9,10 @@ export class Rooms {
     @Column()
     roomId: string;
 
-    @Column()
-    userId: number;
+    @Column({ type: 'int', nullable: true })
+    userId: number | null;
 
-    @Column({ nullable: true })
+    @Column({ type: 'boolean', default: false })
     isAdmin: boolean;
 
 }

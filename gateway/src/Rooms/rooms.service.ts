@@ -1,4 +1,4 @@
-import { Repository } from "typeorm";
+import { IsNull, Not, Repository } from "typeorm";
 import { Rooms } from "./entity/rooms.entity";
 import { InjectRepository } from '@nestjs/typeorm';
 import { randomBytes } from "node:crypto";
@@ -77,7 +77,10 @@ export class RoomService {
         }
 
         const roomMembers = await this.roomsEntity.find({
-            where: { roomId }
+            where: {
+                roomId: roomId,
+                userId: Not(IsNull())
+            }
         });
 
         if (!roomMembers.length) {
@@ -118,11 +121,12 @@ export class RoomService {
                     isAdmin: true
                 }
             });
-            console.log("fetched rooms", getRooms);
             return getRooms;
         } catch (error: any) {
             console.error(error);
             return [];
         }
     }
+
+
 }

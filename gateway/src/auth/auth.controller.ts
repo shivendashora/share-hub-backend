@@ -1,6 +1,7 @@
-import { Body, Controller, Post, Req, UploadedFile, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, Req, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { FileInterceptor } from "@nestjs/platform-express";
+import { JwtAuthGuard } from "./auth-guard";
 
 @Controller('auth')
 
@@ -22,6 +23,25 @@ export class AuthController{
         ;
         const response = this.authService.signUp(body);
         return response;
+    }
+    @Get('/logoutuser/:roomId')
+    @UseGuards(JwtAuthGuard)
+    async handleLogout(
+        @Req() req,
+        @Param('roomId') roomId:string
+
+    ){
+        try{
+            const userId = req.user.userId;
+            const response = await this.authService.handleLogOut(userId,roomId)
+            return response;
+        }
+        catch(e:any){
+            console.error(e);
+        }
+        return{
+            message:"cannot logout user"
+        }
     }
 
 }

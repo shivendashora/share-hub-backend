@@ -14,13 +14,10 @@ export class RoomController {
     @Get('createRoomForUser')
     async getRoomForUser(@Req() req) {
 
-        console.log("calling create room api");
-        console.log("userId",req.user.userId);
 
         try {
             const userId = req.user.userId;
             const response = await this.roomService.createRoomForUser(userId);
-            console.log("response",response);
             return response;
         }
         catch (e: any) {
@@ -54,12 +51,11 @@ export class RoomController {
     @UseGuards(JwtAuthGuard)
     async getRoomMembers(@Param('roomId') roomId: string) {
         try {
-            console.log("roomId",roomId);
             const response = await this.roomService.getRoomMembers(roomId);
             return response;
         }
         catch (e: any) {
-            console.log(e);
+            console.error(e);
         }
 
         return {
@@ -76,7 +72,7 @@ export class RoomController {
             return { message: "Successfully left the room" };
         }
         catch (e: any) {
-            console.log(e);
+            console.error(e);
         }
 
         return {
