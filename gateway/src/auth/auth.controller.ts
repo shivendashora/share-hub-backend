@@ -5,12 +5,12 @@ import { JwtAuthGuard } from "./auth-guard";
 
 @Controller('auth')
 
-export class AuthController{
+export class AuthController {
 
-    constructor(private readonly authService: AuthService) {}
+    constructor(private readonly authService: AuthService) { }
 
     @Post('login')
-    login(@Req() data:any){
+    login(@Req() data: any) {
         const response = this.authService.login(data);
         return response;
     }
@@ -19,7 +19,7 @@ export class AuthController{
     signup(
         @Body() body: any,
         @UploadedFile() avatar?: Express.Multer.File,  // the file
-    ){
+    ) {
         ;
         const response = this.authService.signUp(body);
         return response;
@@ -28,19 +28,19 @@ export class AuthController{
     @UseGuards(JwtAuthGuard)
     async handleLogout(
         @Req() req,
-        @Param('roomId') roomId:string
+        @Param('roomId') roomId: string
 
-    ){
-        try{
+    ) {
+        try {
             const userId = req.user.userId;
-            const response = await this.authService.handleLogOut(userId,roomId)
+            const response = await this.authService.handleLogOut(userId, roomId)
             return response;
         }
-        catch(e:any){
+        catch (e: any) {
             console.error(e);
         }
-        return{
-            message:"cannot logout user"
+        return {
+            message: "cannot logout user"
         }
     }
 

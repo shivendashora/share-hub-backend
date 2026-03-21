@@ -42,50 +42,47 @@ export class AuthService {
     return response;
   }
 
-async handleLogOut(userId: number, roomId: string) {
-  try {
-    // Step 1: Find user in that room
-    console.log(roomId);
-    console.log(userId);
-    const user = await this.roomsEntity.findOne({
-      where: {
-        userId: userId,
-        roomId: roomId
+  async handleLogOut(userId: number, roomId: string) {
+    try {
+      const user = await this.roomsEntity.findOne({
+        where: {
+          userId: userId,
+          roomId: roomId
+        }
+      });
+
+      if (!user) {
+        return { message: "User not found in room" };
       }
-    });
 
-    if (!user) {
-      return { message: "User not found in room" };
+      let response;
+
+      // Step 2: If admin → logout everyone in room
+      if (user.isAdmin) {
+        response = await this.roomsEntity.update(
+          { roomId: roomId },   // all users in room
+          { userId: null }
+        );
+      }
+      // Step 3: If normal user → logout only that user
+      else {
+        response = await this.roomsEntity.update(
+          { userId: userId, roomId: roomId },
+          { userId: null }
+        );
+      }
+
+      return {
+        message: "Logout successful",
+        affected: response.affected
+      };
+
+    } catch (e: any) {
+      console.error(e);
+      return {
+        message: "Error logging out user"
+      };
     }
-
-    let response;
-
-    // Step 2: If admin → logout everyone in room
-    if (user.isAdmin) {
-      response = await this.roomsEntity.update(
-        { roomId: roomId },   // all users in room
-        { userId: null }
-      );
-    } 
-    // Step 3: If normal user → logout only that user
-    else {
-      response = await this.roomsEntity.update(
-        { userId: userId, roomId: roomId },
-        { userId: null }
-      );
-    }
-
-    return {
-      message: "Logout successful",
-      affected: response.affected
-    };
-
-  } catch (e: any) {
-    console.error(e);
-    return {
-      message: "Error logging out user"
-    };
   }
-}
 
 }
