@@ -5,6 +5,7 @@ import { AuthModule } from './auth/auth.module';
 import { RoomModule } from './Rooms/room.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Rooms } from './Rooms/entity/rooms.entity';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [ TypeOrmModule.forRoot({
@@ -16,7 +17,7 @@ import { Rooms } from './Rooms/entity/rooms.entity';
       database: 'sharehubdb',
       entities: [Rooms],
       synchronize: true,
-    }),AuthModule,RoomModule],
+    }),AuthModule,RoomModule, ChatModule],
   controllers: [AppController],
   providers: [AppService],
 })

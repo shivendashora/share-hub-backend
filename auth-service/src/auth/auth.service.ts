@@ -51,8 +51,6 @@ export class AuthService {
                 userId: savedUser.id,
             };
         }
-
-        // ✅ Guard — catches the bcrypt error before it happens
         if (!body.password) {
             return {
                 message: "Password is required for regular signup",
@@ -113,7 +111,6 @@ export class AuthService {
         }
     }
 
-    // auth.service.ts
 async findMembers(data: { membersIds: number[] }) {
 
     const memberIds = data.membersIds;
