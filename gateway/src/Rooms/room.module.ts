@@ -4,6 +4,7 @@ import { RoomService } from './rooms.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Rooms } from './entity/rooms.entity';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { ChatEntity } from './entity/chat.entity';
 
 @Module({
   imports: [ClientsModule.register([
@@ -15,7 +16,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
         port: 4001,
       },
     },
-  ]), TypeOrmModule.forFeature([Rooms])],
+  ]), TypeOrmModule.forFeature([Rooms,ChatEntity])],
   controllers: [RoomController],
   providers: [RoomService],
 })

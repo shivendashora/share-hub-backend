@@ -1,4 +1,4 @@
-import { IsArray,  IsBoolean,  IsString } from "class-validator";
+import { IsArray, IsBoolean, IsOptional, IsString } from "class-validator";
 
 export class LoginDto {
 
@@ -25,6 +25,28 @@ export class SignInDto {
 
     @IsBoolean()
     isGuestUser:boolean;
+}
+
+export class UpdateUserProfileDto {
+    @IsOptional()
+    @IsString()
+    username?: string;
+
+    @IsOptional()
+    @IsString()
+    email?: string;
+
+    @IsOptional()
+    @IsString()
+    password?: string;
+
+    @IsOptional()
+    @IsString()
+    confirmPassWord?: string;
+
+    @IsOptional()
+    @IsString()
+    profile?: string;
 }
 
 export class MembersDto{

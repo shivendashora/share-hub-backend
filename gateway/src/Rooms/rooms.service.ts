@@ -1,5 +1,6 @@
 import { IsNull, Not, Repository } from "typeorm";
 import { Rooms } from "./entity/rooms.entity";
+import { ChatEntity } from "./entity/chat.entity";
 import { InjectRepository } from '@nestjs/typeorm';
 import { randomBytes } from "node:crypto";
 import { Injectable, NotFoundException, ConflictException, BadRequestException, Inject } from "@nestjs/common";
@@ -12,6 +13,8 @@ export class RoomService {
     constructor(
         @InjectRepository(Rooms)
         private readonly roomsEntity: Repository<Rooms>,
+        @InjectRepository(ChatEntity)
+        private readonly chatEntity: Repository<ChatEntity>,
         @Inject('AUTH_SERVICE') private readonly authClient: ClientProxy,
     ) { }
 
@@ -125,6 +128,53 @@ export class RoomService {
         } catch (error: any) {
             console.error(error);
             return [];
+        }
+    }
+    async getRoomChats(roomId: string) {
+        try {
+            const chats = await this.chatEntity.find({
+                where: { roomId },
+                order: { createdAt: "ASC" }
+            });
+
+            if (!chats.length) {
+                return { data: [] };
+            }
+
+            const userIds = [...new Set(chats.map(chat => chat.userId))];
+            console.log("userIds", userIds);
+
+            const usersResponse = await firstValueFrom(
+                this.authClient.send('findMembersForId', {
+                    membersIds: userIds
+                })
+            );
+            console.log("userresponse", usersResponse);
+
+            const users = usersResponse.mappedUsers;
+            console.log("users", users);
+
+            const userMap: any = new Map(
+                users.map(user => [user.id, user])
+            );
+
+            const finalChats = chats.map(chat => ({
+                id: chat.id,
+                text: chat.chats,
+                userId: chat.userId,
+                userName: userMap.get(chat.userId)?.userName || "Unknown",
+                createdAt: chat.createdAt
+            }));
+
+            console.log(finalChats);
+
+            return {
+                data: finalChats
+            };
+
+        } catch (error) {
+            console.error(error);
+            return { data: [] };
         }
     }
 

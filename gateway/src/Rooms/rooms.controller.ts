@@ -80,21 +80,48 @@ export class RoomController {
         }
     }
 
-    
+
     @Get('getAllRoomsCreatedByUser')
     @UseGuards(JwtAuthGuard)
-    async getAllRoomsCreatedByUser(@Req() req){
-        try{
+    async getAllRoomsCreatedByUser(@Req() req) {
+        try {
 
             const userId = req.user.userId;
             const response = await this.roomService.getAllRoomsCreatedByUser(userId)
             return response;
         }
-        catch(error){
+        catch (error) {
             console.error(error);
         }
-        return{
-            message:"failed fetching rooms for user"
+        return {
+            message: "failed fetching rooms for user"
+        }
+    }
+    @Post('/getRoomChats')
+    @UseGuards(JwtAuthGuard)
+    async getRoomChats(
+        @Body() body: {
+            roomId: string,
+        }
+    ) {
+
+        try {
+
+            const response = await this.roomService.getRoomChats(body.roomId);
+            if (response) {
+                return {
+                    message: "successfully fetched the room chats",
+                    response
+                }
+            }
+            else {
+                return {
+                    message: "could not fetch the chats please try again"
+                }
+            }
+        }
+        catch (e: any) {
+            console.error(e);
         }
     }
 
@@ -102,4 +129,3 @@ export class RoomController {
 
 
 }
- 

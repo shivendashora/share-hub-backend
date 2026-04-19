@@ -31,6 +31,7 @@ export class AuthService {
       username: body.username,
       email: body.email,
       password: body.password,
+      confirmPassWord: body.confirmPassWord,
       isGuestUser: body.isGuestUser === "true",
       roomId: body.roomId ? Number(body.roomId) : null,  // ← pass it through
     }
@@ -42,7 +43,25 @@ export class AuthService {
     return response;
   }
 
-  async handleLogOut(userId: number, roomId: string) {
+  async completeProfile(userId: number, body: any) {
+
+    const completeProfilePayload = {
+      userId,
+      username: body.username,
+      email: body.email,
+      password: body.password,
+      confirmPassWord: body.confirmPassWord,
+      profile: body.profile,
+    };
+
+    const response = await firstValueFrom(
+      this.authClient.send('completeProfile', completeProfilePayload)
+    );
+
+    return response;
+  }
+
+  async handleLogOut(userId: number, roomId?: string) {
     try {
       const user = await this.roomsEntity.findOne({
         where: {
@@ -83,6 +102,12 @@ export class AuthService {
         message: "Error logging out user"
       };
     }
+  }
+  async getUserDetails(data: { memberIds: number[] }) {
+    const response = await firstValueFrom(
+      this.authClient.send('findMembersForId', { membersIds: data.memberIds }) // ← was 'findMembers'
+    );
+    return response;
   }
 
 }

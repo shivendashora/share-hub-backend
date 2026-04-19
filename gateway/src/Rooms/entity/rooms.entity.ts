@@ -1,10 +1,11 @@
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
-@Entity()
+@Entity({name:"rooms"})
+@Entity({ name: "rooms" })
 export class Rooms {
 
     @PrimaryGeneratedColumn()
-    id:number;
+    id: number | undefined;
 
     @Column()
     roomId: string;
@@ -14,5 +15,4 @@ export class Rooms {
 
     @Column({ type: 'boolean', default: false })
     isAdmin: boolean;
-
 }

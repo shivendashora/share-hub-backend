@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Req, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Get, Param, Patch, Post, Query, Req, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { JwtAuthGuard } from "./auth-guard";
@@ -24,16 +24,34 @@ export class AuthController {
         const response = this.authService.signUp(body);
         return response;
     }
-    @Get('/logoutuser/:roomId')
+
+    @Patch("complete-profile")
+    @UseGuards(JwtAuthGuard)
+    @UseInterceptors(FileInterceptor("profile"))
+    async completeProfile(
+        @Req() req,
+        @Body() body,
+        @UploadedFile() file
+    ) {
+        if (file) {
+            body.profile = file;
+        }
+
+        return this.authService.completeProfile(req.user.userId, body);
+    }
+
+    @Post('/logoutuser')
     @UseGuards(JwtAuthGuard)
     async handleLogout(
         @Req() req,
-        @Param('roomId') roomId: string
+        @Body() body: {
+            roomId: string
+        }
 
     ) {
         try {
             const userId = req.user.userId;
-            const response = await this.authService.handleLogOut(userId, roomId)
+            const response = await this.authService.handleLogOut(userId, body.roomId)
             return response;
         }
         catch (e: any) {
@@ -44,4 +62,10 @@ export class AuthController {
         }
     }
 
+
+    @Get('userDetails')
+    async getUserDetails(@Query('ids') ids: string) {
+        const memberIds = ids.split(',').map(Number).filter(Boolean);
+        return this.authService.getUserDetails({ memberIds });
+    }
 }
