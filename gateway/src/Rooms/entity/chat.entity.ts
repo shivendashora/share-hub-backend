@@ -1,8 +1,14 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import {
+    Entity,
+    Column,
+    PrimaryGeneratedColumn,
+    ManyToOne,
+    JoinColumn,
+} from "typeorm";
+import { Documents } from "./rooms.entity";
 
 @Entity({ name: "chats" })
 export class ChatEntity {
-
     @PrimaryGeneratedColumn()
     id: number;
 
@@ -13,12 +19,35 @@ export class ChatEntity {
     roomId: string;
 
     @Column({ nullable: true })
-    chats: string
+    chats: string;
 
-    @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
+    @Column()
+    type: string;
+
+    @Column({
+        name: "document_id",
+        type: "int",
+        nullable: true,
+    })
+    documentId: number;
+
+    @ManyToOne(() => Documents, {
+        eager: true,
+        nullable: true,
+        onDelete: "SET NULL"
+    })
+    @JoinColumn({ name: "document_id" })
+    document: Documents;
+
+    @Column({
+        type: "timestamp",
+        default: () => "CURRENT_TIMESTAMP",
+    })
     createdAt: Date;
 
-    @Column({ type: "timestamp", nullable: true })
+    @Column({
+        type: "timestamp",
+        nullable: true,
+    })
     deletedAt: string;
-
 }

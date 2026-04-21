@@ -1,8 +1,28 @@
-import { WebSocketGateway, WebSocketServer, SubscribeMessage, OnGatewayConnection, OnGatewayDisconnect } from "@nestjs/websockets";
+import {
+  WebSocketGateway,
+  WebSocketServer,
+  SubscribeMessage,
+  OnGatewayConnection,
+  OnGatewayDisconnect,
+} from "@nestjs/websockets";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Server, Socket } from "socket.io";
 import { ChatEntity } from "src/Rooms/entity/chat.entity";
 import { Repository } from "typeorm";
+
+interface SendMessagePayload {
+  message: string;
+  roomId: string;
+  user: {
+    id: number;
+    name: string;
+    avatar?: string;
+  };
+  // Present when the message is a file upload
+  documentId?: number;
+  fileName?: string;
+  filePath?: string;
+}
 
 @WebSocketGateway(3002, { cors: { origin: "*" } })
 export class Chatgateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -12,8 +32,8 @@ export class Chatgateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   constructor(
     @InjectRepository(ChatEntity)
-    private readonly chatEntity: Repository<ChatEntity> 
-  ) {}
+    private readonly chatEntity: Repository<ChatEntity>,
+  ) { }
 
   handleConnection(client: Socket) {
     console.log("Connected:", client.id);
@@ -30,21 +50,30 @@ export class Chatgateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage("sendMessage")
-  async handleSubscribeMessage(
-    client: Socket,
-    data: { message: string; roomId: string; user: { id: number; name: string; avatar?: string } }
-  ) {
+  async handleSubscribeMessage(client: Socket, data: SendMessagePayload) {
+    const isFileMessage = Boolean(data.documentId);
+
+    // Broadcast to everyone else in the room
+    // Include documentId so receivers can fetch the thumbnail themselves
     client.to(data.roomId).emit("sendMessage", {
       message: data.message,
       user: data.user,
+      ...(isFileMessage && {
+        documentId: data.documentId,
+        fileName: data.fileName,
+        filePath: data.filePath,
+      }),
     });
 
     try {
       await this.chatEntity.save({
         userId: data.user.id,
         roomId: data.roomId,
-        chats: data.message,
+        chats: data.message || data.fileName || data.filePath,
+        documentId: data.documentId ?? null,
+        type: isFileMessage ? "file" : "text",
       });
+
       return { message: "saved successfully" };
     } catch (error) {
       console.error("Save error:", error);

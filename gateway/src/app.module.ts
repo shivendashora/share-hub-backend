@@ -4,7 +4,7 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { RoomModule } from './Rooms/room.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Rooms } from './Rooms/entity/rooms.entity';
+import { Documents, Rooms, Thumbnails } from './Rooms/entity/rooms.entity';
 import { ChatModule } from './chat/chat.module';
 import { ChatEntity } from './Rooms/entity/chat.entity';
 
@@ -16,8 +16,8 @@ import { ChatEntity } from './Rooms/entity/chat.entity';
       username: 'postgres',
       password: '123',
       database: 'sharehubdb',
-      entities: [Rooms,ChatEntity],
-      synchronize: true,
+      entities: [Rooms,ChatEntity,Documents,Thumbnails],
+      synchronize: false,
     }),AuthModule,RoomModule, ChatModule],
   controllers: [AppController],
   providers: [AppService],
